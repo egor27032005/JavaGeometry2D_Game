@@ -3,7 +3,6 @@ package misc;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import panels.PanelLog;
 
 import java.util.Objects;
 
@@ -198,7 +197,7 @@ public class CoordinateSystem2d {
     public void scale(double s, Vector2d center) {
         // если центр масштабирования находится вне СК
         if (!checkCoords(center)) {
-            PanelLog.warning("центр масштабирования находится вне области");
+            System.out.println("центр масштабирования находится вне области");
             return;
         }
 

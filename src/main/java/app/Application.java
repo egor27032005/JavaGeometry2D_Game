@@ -2,16 +2,12 @@ package app;
 
 import controls.InputFactory;
 import dialogs.PanelInfo;
-import dialogs.PanelSelectFile;
 import io.github.humbleui.jwm.*;
 import io.github.humbleui.jwm.skija.EventFrameSkija;
 import io.github.humbleui.skija.Canvas;
 import io.github.humbleui.skija.Surface;
 import misc.CoordinateSystem2i;
-import panels.PanelControl;
-import panels.PanelHelp;
-import panels.PanelLog;
-import panels.PanelRendering;
+import panels.PanelGame;
 
 import java.io.File;
 import java.util.Calendar;
@@ -35,11 +31,7 @@ public class Application implements Consumer<Event> {
         /**
          * Окно информации
          */
-        INFO,
-        /**
-         * работа с файлами
-         */
-        FILE
+        INFO
     }
 
     /**
@@ -58,23 +50,6 @@ public class Application implements Consumer<Event> {
      * кнопка изменений: у мака - это `Command`, у windows - `Ctrl`
      */
     public static final KeyModifier MODIFIER = Platform.CURRENT == Platform.MACOS ? KeyModifier.MAC_COMMAND : KeyModifier.CONTROL;
-
-    /**
-     * панель легенды
-     */
-    private final PanelHelp panelHelp;
-    /**
-     * панель курсора мыши
-     */
-    private final PanelControl panelControl;
-    /**
-     * панель рисования
-     */
-    private final PanelRendering panelRendering;
-    /**
-     * панель событий
-     */
-    private final PanelLog panelLog;
     /**
      * время последнего нажатия клавиши мыши
      */
@@ -92,9 +67,9 @@ public class Application implements Consumer<Event> {
      */
     public static Mode currentMode = Mode.WORK;
     /**
-     * Панель выбора файла
+     * Панель игры
      */
-    private final PanelSelectFile panelSelectFile;
+    private final PanelGame panelGame;
 
     /**
      * Конструктор окна приложения
@@ -106,29 +81,8 @@ public class Application implements Consumer<Event> {
         // панель информации
         panelInfo = new PanelInfo(window, true, DIALOG_BACKGROUND_COLOR, PANEL_PADDING);
 
-        // Панель выбора файла
-        panelSelectFile = new PanelSelectFile(window, true, DIALOG_BACKGROUND_COLOR, PANEL_PADDING);
-
-        // создаём панель рисования
-        panelRendering = new PanelRendering(
-                window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, 5, 3, 0, 0,
-                3, 2
-        );
-        // создаём панель управления
-        panelControl = new PanelControl(
-                window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, 5, 3, 3, 0,
-                2, 2
-        );
-        // создаём панель лога
-        panelLog = new PanelLog(
-                window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, 5, 3, 0, 2,
-                3, 1
-        );
-        // создаём панель помощи
-        panelHelp = new PanelHelp(
-                window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, 5, 3, 3, 2,
-                2, 1
-        );
+        // панель игры
+        panelGame = new PanelGame(window, true, DIALOG_BACKGROUND_COLOR, PANEL_PADDING);
 
         // задаём обработчиком событий текущий объект
         window.setEventListener(this);
@@ -200,8 +154,6 @@ public class Application implements Consumer<Event> {
                     switch (eventKey.getKey()) {
                         case W -> window.close();
                         case H -> window.minimize();
-                        case S -> PanelRendering.save();
-                        case O -> PanelRendering.load();
                         case DIGIT1 -> {
                             if (maximizedWindow)
                                 window.restore();
@@ -243,13 +195,7 @@ public class Application implements Consumer<Event> {
 
         switch (currentMode) {
             case INFO -> panelInfo.accept(e);
-            case FILE -> panelSelectFile.accept(e);
-            case WORK -> {
-                // передаём события на обработку панелям
-                panelControl.accept(e);
-                panelRendering.accept(e);
-                panelLog.accept(e);
-            }
+            case WORK -> panelGame.accept(e);
         }
     }
 
@@ -265,16 +211,12 @@ public class Application implements Consumer<Event> {
         // очищаем канвас
         canvas.clear(APP_BACKGROUND_COLOR);
         // рисуем панели
-        panelRendering.paint(canvas, windowCS);
-        panelControl.paint(canvas, windowCS);
-        panelLog.paint(canvas, windowCS);
-        panelHelp.paint(canvas, windowCS);
+        panelGame.paint(canvas, windowCS);
         canvas.restore();
 
         // рисуем диалоги
         switch (currentMode) {
             case INFO -> panelInfo.paint(canvas, windowCS);
-            case FILE -> panelSelectFile.paint(canvas, windowCS);
         }
     }
 }
