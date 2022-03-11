@@ -47,6 +47,15 @@ public class Vector2d {
         return new Vector2d(a.x + b.x, a.y + b.y);
     }
 
+    /**
+     * Умножение вектора на число
+     *
+     * @param s число
+     * @return новый вектор
+     */
+    public Vector2d mult(double s) {
+        return new Vector2d(s * x, s * y);
+    }
 
     /**
      * Добавить вектор к текущему вектору
@@ -56,6 +65,19 @@ public class Vector2d {
     public void add(Vector2d v) {
         this.x = this.x + v.x;
         this.y = this.y + v.y;
+    }
+
+    /**
+     * Получить расстояние между векторами
+     *
+     * @param a первый вектор
+     * @param b второй вектор
+     * @return расстояние
+     */
+    public static double distance(Vector2d a, Vector2d b) {
+        double dx = b.x - a.x;
+        double dy = b.y - a.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     /**

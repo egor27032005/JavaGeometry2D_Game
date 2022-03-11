@@ -3,6 +3,7 @@ package panels;
 
 import controls.Label;
 import controls.MultiLineLabel;
+import game.Game;
 import io.github.humbleui.jwm.Window;
 import io.github.humbleui.skija.Canvas;
 import misc.CoordinateSystem2i;
@@ -11,6 +12,10 @@ import misc.CoordinateSystem2i;
  * Панель игры
  */
 public class PanelGame extends Panel {
+    /**
+     * Игра
+     */
+    public static final Game game = Game.getGame();
     /**
      * Заголовок с информацией
      */
@@ -49,10 +54,18 @@ public class PanelGame extends Panel {
      */
     @Override
     public void paintImpl(Canvas canvas, CoordinateSystem2i windowCS) {
+        // задаём текст заголовка
+        infoLabel.text = String.format(
+                "Пройдено %.1f\n Скорость: %.1f", game.getScore(), game.getNewEnemySpeed()
+        );
         // рисуем заголовок информации
         infoLabel.paint(canvas, windowCS);
         // рисуем заголовок подсказки
         hintLabel.paint(canvas, windowCS);
+        // обрабатываем игру
+        game.process();
+        // рисуем игру
+        game.paint(canvas, windowCS);
     }
 
 }

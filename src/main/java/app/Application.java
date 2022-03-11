@@ -1,7 +1,6 @@
 package app;
 
-import controls.InputFactory;
-import dialogs.PanelInfo;
+import dialogs.PanelGameInfo;
 import io.github.humbleui.jwm.*;
 import io.github.humbleui.jwm.skija.EventFrameSkija;
 import io.github.humbleui.skija.Canvas;
@@ -61,7 +60,7 @@ public class Application implements Consumer<Event> {
     /**
      * Панель информации
      */
-    private final PanelInfo panelInfo;
+    private final PanelGameInfo panelGameInfo;
     /**
      * Текущий режим(по умолчанию рабочий)
      */
@@ -78,8 +77,12 @@ public class Application implements Consumer<Event> {
         // создаём окно
         window = App.makeWindow();
 
-        // панель информации
-        panelInfo = new PanelInfo(window, true, DIALOG_BACKGROUND_COLOR, PANEL_PADDING);
+        // панель информации игры
+        panelGameInfo = new PanelGameInfo(window, true, DIALOG_BACKGROUND_COLOR, PANEL_PADDING,
+                () -> {
+                    Application.currentMode = Application.Mode.WORK;
+                    PanelGame.game.restart();
+                });
 
         // панель игры
         panelGame = new PanelGame(window, true, DIALOG_BACKGROUND_COLOR, PANEL_PADDING);
@@ -154,26 +157,11 @@ public class Application implements Consumer<Event> {
                     switch (eventKey.getKey()) {
                         case W -> window.close();
                         case H -> window.minimize();
-                        case DIGIT1 -> {
-                            if (maximizedWindow)
-                                window.restore();
-                            else
-                                window.maximize();
-                            maximizedWindow = !maximizedWindow;
-                        }
-                        case DIGIT2 -> window.setOpacity(window.getOpacity() == 1f ? 0.5f : 1f);
                     }
                 else
                     switch (eventKey.getKey()) {
-                        case ESCAPE -> {
-                            if (currentMode.equals(Mode.WORK)) {
-                                window.close();
-                                // завершаем обработку, иначе уже разрушенный контекст
-                                // будет передан панелям
-                                return;
-                            }
-                        }
-                        case TAB -> InputFactory.nextTab();
+                        case W, SPACE -> PanelGame.game.up();
+                        case ESCAPE -> window.close();
                     }
             }
         }
@@ -194,7 +182,7 @@ public class Application implements Consumer<Event> {
         }
 
         switch (currentMode) {
-            case INFO -> panelInfo.accept(e);
+            case INFO -> panelGameInfo.accept(e);
             case WORK -> panelGame.accept(e);
         }
     }
@@ -214,9 +202,9 @@ public class Application implements Consumer<Event> {
         panelGame.paint(canvas, windowCS);
         canvas.restore();
 
-        // рисуем диалоги
-        switch (currentMode) {
-            case INFO -> panelInfo.paint(canvas, windowCS);
-        }
+        // если нужно отобразить информацию,
+        if (currentMode.equals(Mode.INFO))
+            // выводим её
+            panelGameInfo.paint(canvas, windowCS);
     }
 }

@@ -15,7 +15,7 @@ import static app.Colors.BUTTON_COLOR;
 /**
  * Панель управления
  */
-public class PanelInfo extends Panel {
+public class PanelGameInfo extends Panel {
     /**
      * Отступы в панели управления
      */
@@ -37,6 +37,11 @@ public class PanelInfo extends Panel {
      */
     private static String labelText;
 
+    /**
+     * Обработчик нажатия кнопки ОК на панели
+     */
+    Runnable onClick;
+
 
     /**
      * Панель управления
@@ -46,7 +51,8 @@ public class PanelInfo extends Panel {
      * @param color   цвет подложки
      * @param padding отступы
      */
-    public PanelInfo(Window window, boolean drawBG, int color, int padding) {
+    public PanelGameInfo(Window window, boolean drawBG, int color, int padding,
+                         Runnable onClick) {
         super(window, drawBG, color, padding);
 
         // добавление вручную
@@ -54,13 +60,12 @@ public class PanelInfo extends Panel {
                 1, 2, 0, 0, 1, 1, "",
                 true, true);
 
-
         accept = new Button(
                 window, false, BUTTON_COLOR, CONTROL_PADDING,
                 1, 2, 0, 1, 1, 1, "ОК",
                 true, true);
-        accept.setOnClick(() -> Application.currentMode = Application.Mode.WORK);
-
+        accept.setOnClick(onClick);
+        this.onClick = onClick;
     }
 
 
@@ -105,9 +110,9 @@ public class PanelInfo extends Panel {
                 // перебираем варианты
                 switch (key) {
                     // если esc
-                    case ESCAPE -> Application.currentMode = Application.Mode.WORK;
+                    case ESCAPE -> onClick.run();
                     // если enter
-                    case ENTER -> Application.currentMode = Application.Mode.WORK;
+                    case ENTER -> onClick.run();
                 }
             }
         }
